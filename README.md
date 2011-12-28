@@ -22,13 +22,16 @@ WordPress_Plugin_Bootstrap::create_model( string $name, array $attributes );
 ``` 
 
 *$name* - Name of model. For proper CRUD routing, keep singular. 
+
 Examples: 
-* category
-* event
-* widget
+
+* Category
+* Event
+* Widget
 
 *$attributes* - Model attrubutes that get stored in the database with associated field types. 
 Examples:
+
 * 'title' => 'string'
 * 'description' => 'text'
 * 'active' => 'boolean'

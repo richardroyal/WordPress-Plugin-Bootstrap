@@ -11,8 +11,6 @@ Author URI: http://saidigital.co
 defined('WP_PLUGIN_URL') or die('Restricted access');
 
 
-
-
 /* Initial Setup */
 $plugin_folder_name =  plugins_url( '' , __FILE__ );
 
@@ -50,6 +48,8 @@ require_once("lib/class.item.php");
 require_once("views/view.items.php");
 require_once("views/view.menu.php");
 */
+
+$wppb->create_model('widget', array('name'=>'string', 'description'=>'text', 'active'=>'boolean'));
 
 
 
