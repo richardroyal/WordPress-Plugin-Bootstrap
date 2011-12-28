@@ -18,11 +18,25 @@ Coming soon.
 # Usage
 
 ```
+WordPress_Plugin_Bootstrap::create_model( string $name, array $attributes );
+``` 
 
-WordPress_Plugin_Bootstrap::create_model( string $name, array $fields )
+*$name* - Name of model. For proper CRUD routing, keep singular. 
+Examples: 
+* category
+* event
+* widget
 
+*$attributes* - Model attrubutes that get stored in the database with associated field types. 
+Examples:
+* 'title' => 'string'
+* 'description' => 'text'
+* 'active' => 'boolean'
+
+```
 # Example:
 $wppb = new WordPress_Plugin_Bootstrap();
 $wppb->create_model('widget', array('name'=>'string', 'description'=>'text', 'active'=>'boolean'));
-
 ```
+
+
