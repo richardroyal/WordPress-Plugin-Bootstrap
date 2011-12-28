@@ -17,5 +17,12 @@ Coming soon.
 
 # Usage
 
-Coming soon.
+```
 
+WordPress_Plugin_Bootstrap::create_model( string $name, array $fields )
+
+# Example:
+$wppb = new WordPress_Plugin_Bootstrap();
+$wppb->create_model('widget', array('name'=>'string', 'description'=>'text', 'active'=>'boolean'));
+
+```
