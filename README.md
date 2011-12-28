@@ -9,6 +9,7 @@ Simple WordPress Plugin Bootstrap that allows for easy creation of Admin CRUD ac
   * Generate routes for create, read, update and delete (CRUD) for persistent storage of objects.
 * Create field types for strings, blobs, decimals, booleans (check boxes), unique ids with automatic HTML form fields and WYSIWYG integration.
 * Links images, CSS, and Javascripts dynamically and keeps with best practices.
+* Creates timestamp columns for models: updated_at, created_at.
 * Helpful code comments that allow for easy setup and helps avoid common and costly pitfalls.
 
 # Installation
