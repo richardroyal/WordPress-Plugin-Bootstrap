@@ -14,8 +14,8 @@ defined('WP_PLUGIN_URL') or die('Restricted access');
 /* Initial Setup */
 $plugin_folder_name =  plugins_url( '' , __FILE__ );
 
-if(!class_exists("WordPress_Plugin_Bootstrap")) require_once('lib/class.wordpress-plugin-bootstrap.php');
-$wppb = new WordPress_Plugin_Bootstrap(); 
+if(!class_exists("WordPress_Plugin_Model")) require_once('lib/class.wordpress-plugin-model.php');
+$wppb = new WordPress_Plugin_Model('widget', array('name'=>'string', 'description'=>'text', 'active'=>'boolean')); 
 
 global $wpdb;
 define('WPPB_PATH',ABSPATH.PLUGINDIR."/".$plugin_folder_name."/");
@@ -49,14 +49,14 @@ require_once("views/view.items.php");
 require_once("views/view.menu.php");
 */
 
-$wppb->create_model('widget', array('name'=>'string', 'description'=>'text', 'active'=>'boolean'));
+#$wppb->create_model('widget', array('name'=>'string', 'description'=>'text', 'active'=>'boolean'));
 
 
 
 
 
 /* run setup scripts on activation */
-register_activation_hook(__FILE__,'wppb_install_plugin');
+#register_activation_hook(__FILE__,'wppb_install_plugin');
 
 
 
@@ -75,7 +75,8 @@ function wppb_admin_menu() {
 //    add_submenu_page("wppb-menu-setup", $title.'Manage Categories', "Categories", WPPB_CAPABILITY, "wppb-category-setup", "wp_restaurant_admin_category" );
 //    add_submenu_page("wppb-menu-setup", $title.'Manager Items', "Items", WPPB_CAPABILITY, "wppb-item-setup", "wp_restaurant_admin_item" );
   }
-}add_action('admin_menu', 'wppb_admin_menu');
+}
+#add_action('admin_menu', 'wppb_admin_menu');
 
 
 
@@ -85,27 +86,29 @@ function wppb_admin_menu() {
 /**
  *  Register Frontend CSSs
  */
+ /*
 function wppb_stylesheets() {
   if(!is_admin()){
     wp_enqueue_style('wppb-style', WPPB_URL.'css/style.css');  
   } 
 }add_action('wp_print_styles', 'wppb_stylesheets');
-
-
+*/
 
 
 
 /**
  *  Register CSS for Admin Pages
  */
+ /*
 function wppb_admin_register_css(){
   wp_enqueue_style('wppb-admin-style', WPPB_URL.'css/admin.css');
   wp_enqueue_style('thickbox');
 }add_action('admin_init', 'wppb_admin_register_css');
-
+*/
 
 
 /*** Register admin JS */
+/*
 function wppb_admin_scripts() {
   if(isset($_GET['page']) && $_GET['page'] == WPPB_ADMIN_URL) {
     wp_enqueue_script('media-upload');
@@ -114,7 +117,7 @@ function wppb_admin_scripts() {
     wp_enqueue_script('wppb-admin');
   }
 }add_action('admin_print_scripts', 'wppb_admin_scripts');
-
+*/
 
 
 
@@ -122,10 +125,11 @@ function wppb_admin_scripts() {
 
 
 /*** Use Shortcode API to output menus on frontend */
+/*
 function wppb_shortcode_handler($atts, $content=null, $code=""){
  return wppb_get_menu($atts);
 }add_shortcode('WP_Restaurant_Menu', 'wppb_shortcode_handler');
-
+*/
 
 
 
@@ -134,13 +138,14 @@ function wppb_shortcode_handler($atts, $content=null, $code=""){
 /**
  *  Setup custom URL for Export Route and Create New
  */
+
 function wppb_parse_export($wp) {
     // only process requests POST'ed to "/?wppb-routing=export"
     if (array_key_exists('wppb-routing', $wp->query_vars) && $wp->query_vars['wppb-routing'] == 'export') {
       include('export/export-menu.php');
       die();exit();
     }
-}add_action('parse_request', 'wppb_parse_export');
+}#add_action('parse_request', 'wppb_parse_export');
 
 function wppb_parse_crud($wp) {
     // only process requests POST'ed to "/?wppb-routing=crud"
@@ -148,12 +153,12 @@ function wppb_parse_crud($wp) {
       include('admin/crud-routing.php');
       die();exit();
     }
-}add_action('parse_request', 'wppb_parse_crud');
+}#add_action('parse_request', 'wppb_parse_crud');
 
 function wppb_parse_query_vars($vars) {
     $vars[] = 'wppb-routing';
     return $vars;
-}add_filter('query_vars', 'wppb_parse_query_vars');
+}#add_filter('query_vars', 'wppb_parse_query_vars');
 
 
 
