@@ -1,11 +1,15 @@
 <?php
-#class WordPress_Plugin_Bootstrap{
 class WordPress_Plugin_Model{
 
   // Create object, menu, and varify database structure
   public function __construct($name, $attr) {
+    global $wpdb;
+    $this->name = $name;
     $this->class_name = $name;
+    $this->table_name = $wpdb->prefix.'model_'.$name;
     $this->attr = $attr;
+    $this->capability = "publish_posts";
+    $this->admin_url = "wp-manage-model";
 
     $this->verify_db();
     $this->create_menu();
@@ -21,24 +25,27 @@ class WordPress_Plugin_Model{
 
 
     // setup database structure for Answers
-    if($wpdb->get_var("show tables like '".WPSS_ANSWERS_DB."'") != WPSS_ANSWERS_DB){
-        $sql =  "CREATE TABLE ".WPSS_ANSWERS_DB." (".
+    if($wpdb->get_var("show tables like '$this->table_name'") != $this->table_name){
+        $sql =  "CREATE TABLE '$this->table_name' (".
                    "id int NOT NULL AUTO_INCREMENT, ";
                    foreach($this->attr as $name => $type){
                      $sql .= "$name $type, ";
                    }    
-                   $sql .= "UNIQUE KEY id (id) ";
-               ")";
+                   $sql .= "UNIQUE KEY id (id) )";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        echo $sql;
 #        dbDelta($sql);
     }
   }
 
   
-  // Create Admin menus for model
+  // Create Admin menu for model
   private function create_menu(){
-    
-    
+    #global $current_user;
+    #if (!current_user_can('manage_options')) return false;
+
+    // add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
+    #add_menu_page("WP Model ".$this->name, "Manage ".$this->name, $this->capability, $this->admin_url, "wppb_model_index");   
   }
   
 }

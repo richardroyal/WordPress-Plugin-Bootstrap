@@ -21,6 +21,9 @@ global $wpdb;
 define('WPPB_PATH',ABSPATH.PLUGINDIR."/".$plugin_folder_name."/");
 define('WPPB_URL',WP_PLUGIN_URL."/".$plugin_folder_name."/");
 
+/* Admin menu creating callback */
+function wppb_model_index(){require_once("admin/manage-model.php");}
+
 
 
 define('WPPB_MENU_DB',$wpdb->prefix.'wppb_menus');
@@ -63,19 +66,19 @@ require_once("views/view.menu.php");
 /**
  *   Admin page Routes and Callbacks
  */
-function wp_restaurant_admin(){require_once("admin/manage-menus.php");}
-function wp_restaurant_admin_category(){require_once("admin/manage-categories.php");}
-function wp_restaurant_admin_item(){require_once("admin/manage-items.php");}
-function wppb_admin_menu() {
-  if (current_user_can('manage_options')) {
-    $title = "WP Restaurant Menu Manager - "; 
+#function wp_restaurant_admin(){require_once("admin/manage-menus.php");}
+#function wp_restaurant_admin_category(){require_once("admin/manage-categories.php");}
+#function wp_restaurant_admin_item(){require_once("admin/manage-items.php");}
+#function wppb_admin_menu() {
+#  if (current_user_can('manage_options')) {
+#    $title = "WP Restaurant Menu Manager - "; 
     // add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
-    add_menu_page($title . "Setup Menus", "Manage Menus", WPPB_CAPABILITY, WPPB_ADMIN_URL, "wp_restaurant_admin");
+#    add_menu_page($title . "Setup Menus", "Manage Menus", WPPB_CAPABILITY, WPPB_ADMIN_URL, "wp_restaurant_admin");
     // add_submenu_page( $parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
 //    add_submenu_page("wppb-menu-setup", $title.'Manage Categories', "Categories", WPPB_CAPABILITY, "wppb-category-setup", "wp_restaurant_admin_category" );
 //    add_submenu_page("wppb-menu-setup", $title.'Manager Items', "Items", WPPB_CAPABILITY, "wppb-item-setup", "wp_restaurant_admin_item" );
-  }
-}
+#  }
+#}
 #add_action('admin_menu', 'wppb_admin_menu');
 
 
