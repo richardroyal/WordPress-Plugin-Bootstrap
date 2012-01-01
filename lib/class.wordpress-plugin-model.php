@@ -12,7 +12,7 @@ class WordPress_Plugin_Model{
     $this->admin_url = "wp-manage-model";
 
     $this->verify_db();
-    $this->create_menu();
+    add_action('admin_menu', array(&$this, 'create_menu'));
     
 
   }
@@ -40,12 +40,13 @@ class WordPress_Plugin_Model{
 
   
   // Create Admin menu for model
-  private function create_menu(){
+  public function create_menu(){
     #global $current_user;
     #if (!current_user_can('manage_options')) return false;
 
     // add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
     #add_menu_page("WP Model ".$this->name, "Manage ".$this->name, $this->capability, $this->admin_url, "wppb_model_index");   
+    add_menu_page("WP Model ".$this->name, "Manage ".$this->name, $this->capability, $this->admin_url, "wppb_model_index");   
   }
   
 }
