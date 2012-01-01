@@ -4,8 +4,8 @@ class WordPress_Plugin_Model{
   // Create object, menu, and varify database structure
   public function __construct($name, $attr) {
     global $wpdb;
-    $this->name = $name;
-    $this->class_name = $name;
+    $this->name = ucfirst($name);
+    $this->class_name = strtolower(str_replace(array(" ","'"),array('_',''),$name));
     $this->table_name = $wpdb->prefix.'model_'.$name;
     $this->attr = $attr;
     $this->capability = "publish_posts";
@@ -41,11 +41,8 @@ class WordPress_Plugin_Model{
   
   // Create Admin menu for model
   public function create_menu(){
-    #global $current_user;
-    #if (!current_user_can('manage_options')) return false;
 
     // add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
-    #add_menu_page("WP Model ".$this->name, "Manage ".$this->name, $this->capability, $this->admin_url, "wppb_model_index");   
     add_menu_page("WP Model ".$this->name, "Manage ".$this->name, $this->capability, $this->admin_url, "wppb_model_index");   
   }
   
