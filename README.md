@@ -19,7 +19,7 @@ Coming soon.
 # Usage
 
 ```
-WordPress_Plugin_Bootstrap::create_model( string $name, array $attributes );
+WordPress_Plugin_Model::__construct( string $name, array $attributes );
 ``` 
 
 *$name* - Name of model. For proper CRUD routing, keep singular.  
@@ -30,8 +30,7 @@ Examples: 'title' => 'string', 'description' => 'text', 'active' => 'boolean'
 
 ```
 # Example:
-$wppb = new WordPress_Plugin_Bootstrap();
-$wppb->create_model('widget', array('name'=>'string', 'description'=>'text', 'active'=>'boolean'));
+$wppb = new WordPress_Plugin_Model('widget', array('name'=>'string', 'description'=>'text', 'active'=>'boolean')); 
 ```
 
 
