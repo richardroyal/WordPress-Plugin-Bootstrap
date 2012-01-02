@@ -11,21 +11,17 @@ Author URI: http://saidigital.co
 defined('WP_PLUGIN_URL') or die('Restricted access');
 
 
-/* Initial Setup */
-$plugin_folder_name =  plugins_url( '' , __FILE__ );
-
 if(!class_exists("WordPress_Plugin_Model")) require_once('lib/class.wordpress-plugin-model.php');
-$wppb = new WordPress_Plugin_Model('widget', array('name'=>'string', 'description'=>'text', 'active'=>'boolean')); 
 
 global $wpdb;
-define('WPPB_PATH',ABSPATH.PLUGINDIR."/".$plugin_folder_name."/");
-define('WPPB_URL',WP_PLUGIN_URL."/".$plugin_folder_name."/");
+define('WPPB_PATH', plugin_dir_path(__FILE__));
+define('WPPB_URL', plugins_url('', __FILE__));
 
-/* Admin menu creating callback */
-function wppb_model_index(){require_once("admin/manage-model.php");}
-
+$wppb = new WordPress_Plugin_Model('widget', array('name'=>'string', 'description'=>'text', 'active'=>'boolean')); 
 
 
+
+/*
 define('WPPB_MENU_DB',$wpdb->prefix.'wppb_menus');
 define('WPPB_CATEGORY_DB',$wpdb->prefix.'wppb_categories');
 define('WPPB_ITEM_DB',$wpdb->prefix.'wppb_items');
@@ -40,7 +36,7 @@ require_once(ABSPATH.'wp-admin/includes/upgrade.php');
 require_once("lib/db_setup.php");
 require_once("lib/functions.php");
 require_once("admin/functions.php");
-
+*/
 
 
 /* Classes */
