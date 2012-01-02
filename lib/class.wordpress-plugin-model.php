@@ -1,7 +1,12 @@
 <?php
 class WordPress_Plugin_Model{
 
-  // Create object, menu, and varify database structure
+ /** 
+  *  Create object, menu, and varify database structure
+  *
+  *  @param string $name : unique class name 
+  *  @param array $attr : fields and field types for database storage
+  */
   public function __construct($name, $attr) {
     global $wpdb;
     $this->name = ucfirst($name);
@@ -9,7 +14,7 @@ class WordPress_Plugin_Model{
     $this->table_name = $wpdb->prefix.'model_'.$name;
     $this->attr = $attr;
     $this->capability = "publish_posts";
-    $this->admin_url = "wp-manage-".$this->class_name;
+    $this->admin_url = "wppb-manage-$this->class_name";
 
     $this->verify_db();
     $this->set_routes();
@@ -44,8 +49,10 @@ class WordPress_Plugin_Model{
   *  Create class attributes related to routes
   */
   private function set_routes(){
+    // Index route: path and url
     $override = WPPB_PATH."/admin/$this->class_name/wppb-index.php";
-    $this->index_route = file_exists($override) ? $override : WPPB_PATH.'/admin/wppb-index.php';
+    $this->index_path = file_exists($override) ? $override : WPPB_PATH.'/admin/wppb-index.php';
+    $this->index_url = $this->admin_url.'&action=index';
     
   }
 
@@ -65,8 +72,7 @@ class WordPress_Plugin_Model{
   *  in admin folder.
   */
   public function model_index(){
-    #echo $this->index_route;
-    require_once($this->index_route);
+    require_once($this->index_path);
   }
 
 
