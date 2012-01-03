@@ -1,7 +1,6 @@
 <?php
-echo 'asdfasdf';
-#defined('WP_PLUGIN_URL') or die('Restricted access');
-#if (!current_user_can('publish_posts')) #wp_die( __('You do not have sufficient permissions to access this page.') );
+defined('WP_PLUGIN_URL') or die('Restricted access');
+if (!current_user_can('publish_posts')) wp_die( __('You do not have sufficient permissions to access this page.') );
 
 #wprmm_save_menu();
 

@@ -14,11 +14,13 @@ class WordPress_Plugin_Model{
     $this->table_name = $wpdb->prefix.'model_'.$name;
     $this->attr = $attr;
     $this->capability = "publish_posts";
-    $this->admin_url = "wppb-manage-$this->class_name";
-
-    $this->verify_db();
-    $this->set_routes();
-    add_action('admin_menu', array(&$this, 'create_menu'));
+  
+    if(is_admin()){
+      $this->admin_url = "wppb-manage-$this->class_name";
+      $this->verify_db();
+      $this->set_routes();
+      add_action('admin_menu', array(&$this, 'create_menu'));
+    }
     
 
   }
@@ -30,18 +32,17 @@ class WordPress_Plugin_Model{
   */
   private function verify_db(){
     global $wpdb;
-
-    if($wpdb->get_var("show tables like '$this->table_name'") != $this->table_name){
-        $sql =  "CREATE TABLE '$this->table_name' (".
-                   "id int NOT NULL AUTO_INCREMENT, ";
-                   foreach($this->attr as $name => $type){
-                     $sql .= "$name $type, ";
-                   }    
-                   $sql .= "UNIQUE KEY id (id) )";
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        # echo $sql;
-        # dbDelta($sql);
+    $sql =  "CREATE TABLE $this->table_name (" . "\r\n";
+    $sql .=   "`id` mediumint(9) NOT NULL AUTO_INCREMENT," . "\r\n";
+    foreach($this->attr as $field => $field_type){
+      $sql .= "`$field` ".str_replace(array('string', 'boolean'), array('VARCHAR(255)', 'TINYINT(1)'), $field_type)." NOT NULL," . "\r\n";
     }
+    $sql .=   "`updated_at` timestamp default now() on update now()," . "\r\n";
+    $sql .=   "UNIQUE KEY id (id)" . "\r\n";
+    $sql .= ");";
+
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
   }
 
 
