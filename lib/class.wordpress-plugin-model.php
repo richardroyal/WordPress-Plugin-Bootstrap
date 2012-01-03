@@ -2,33 +2,82 @@
 class WordPress_Plugin_Model{
 
  /** 
-  *  Create object, menu, and varify database structure
+  *  Admin Constructor for creating object
+  *  Sets menu, and varifies database structure
   *
   *  @param string $name : unique class name 
-  *  @param array $attr : fields and field types for database storage
+  *  @param mixed $attr
+  *          array  : fields and field types for database storage 
+  *          string : "index"
+  *          int    : database id
+  *                      
   */
-  public function __construct($name, $attr) {
+  public function __construct($name, $attr, $action = "setup", $id = NULL) {
     global $wpdb;
-    $this->name = ucfirst($name);
-    $this->class_name = strtolower(str_replace(array(" ","'"),array('_',''),$name));
-    $this->table_name = $wpdb->prefix.'model_'.$name;
-    $this->attr = $attr;
+
+    $this->set_name($name,$action);
+
+    $this->class_name = strtolower(str_replace(array(" ","'"),array('_',''),$this->name));
+    $this->table_name = $wpdb->prefix.'model_'.$this->name;
     $this->capability = "publish_posts";
-  
+    $this->attr = $attr;
     if(is_admin()){
       $this->admin_url = "wppb-manage-$this->class_name";
-      $this->verify_db();
       $this->set_routes();
-      add_action('admin_menu', array(&$this, 'create_menu'));
     }
-    
+
+    # Set attributes based on action
+    if($action == "setup"){
+      if(function_exists('is_admin') && is_admin()){
+        $this->verify_db();
+        add_action('admin_menu', array(&$this, 'create_menu'));
+      }
+    }
+    elseif($action == "index"){
+      $ids = $wpdb->get_results("SELECT id FROM $this->table_name");
+      $all_objects = array();
+      foreach($ids as $id){
+        #$obj = $wpdb->get_results("SELECT * FROM $this->table_name WHERE id=`$id`");
+        $obj = new WordPress_Plugin_Model($this->name, $this->attr, 'show', $id);
+        $all_objects[] = $obj;
+      }
+      $this->saved_objects = $all_objects;
+    }
+    elseif($action == "show" || $action == "edit"){
+      $obj = $wpdb->get_results("SELECT * FROM $this->table_name WHERE id=`$id`", A_ARRAY);
+      $attr = array();
+      foreach($obj as $field => $value){
+        $attr[$field] = $value;
+      }
+      $this->values = $attr;
+
+
+    }
 
   }
 
 
 
  /**
+  *  Determine name from action or constructor
+  */
+  private function set_name($name, $action){
+    if(!empty($name)) $this->name = ucfirst($name);
+    elseif($action="index"){
+      if($attr=="index"){
+        if(is_admin()){
+          $this->name = str_replace('wppb-manage-', '', $_POST['page']);
+        }
+      }
+    }
+    
+  }
+
+
+
+ /**
   *  Create DB table for object and rebuild structure if necessary
+  *  Relies on dbDelta
   */
   private function verify_db(){
     global $wpdb;
@@ -46,6 +95,8 @@ class WordPress_Plugin_Model{
   }
 
 
+
+
  /**
   *  Create class attributes related to routes
   */
@@ -57,7 +108,9 @@ class WordPress_Plugin_Model{
     
   }
 
-  
+
+
+
  /**
   *  Create Admin menu for model on WP::admin_init
   */
@@ -65,6 +118,8 @@ class WordPress_Plugin_Model{
     // add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
     add_menu_page("WP Model ".$this->name, "Manage ".$this->name, $this->capability, $this->admin_url, array(&$this, 'model_index'));
   }
+
+
 
 
  /**
