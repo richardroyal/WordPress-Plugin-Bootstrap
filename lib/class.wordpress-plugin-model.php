@@ -49,9 +49,7 @@ class WordPress_Plugin_Model{
       foreach($obj as $field => $value){
         $attr[$field] = $value;
       }
-      $this->values = $attr;
-
-
+      $this->data = $attr;
     }
 
   }
@@ -63,14 +61,11 @@ class WordPress_Plugin_Model{
   */
   private function set_name($name, $action){
     if(!empty($name)) $this->name = ucfirst($name);
-    elseif($action="index"){
-      if($attr=="index"){
-        if(is_admin()){
-          $this->name = str_replace('wppb-manage-', '', $_POST['page']);
-        }
+    elseif($action == "index"){
+      if(is_admin()){
+        $this->name = ucfirst(str_replace('wppb-manage-', '', $_GET['page']));
       }
-    }
-    
+    } 
   }
 
 
@@ -103,7 +98,7 @@ class WordPress_Plugin_Model{
   private function set_routes(){
     // Index route: path and url
     $override = WPPB_PATH."/admin/$this->class_name/wppb-index.php";
-    $this->index_path = file_exists($override) ? $override : WPPB_PATH.'/admin/wppb-index.php';
+    $this->index_path = file_exists($override) ? $override : WPPB_PATH.'admin/wppb-index.php';
     $this->index_url = $this->admin_url.'&action=index';
     
   }
