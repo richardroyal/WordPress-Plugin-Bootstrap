@@ -18,9 +18,14 @@ class WordPress_Plugin_Model{
     $this->set_name($name,$action);
 
     $this->class_name = strtolower(str_replace(array(" ","'"),array('_',''),$this->name));
-    $this->table_name = $wpdb->prefix.'model_'.$this->name;
+    $this->table_name = $wpdb->prefix.'model_'.$this->class_name;
     $this->capability = "publish_posts";
     $this->attr = $attr;
+
+    
+    $this->structure = $wpdb->get_results("SHOW COLUMNS FROM $this->table_name");
+
+
     if(is_admin()){
       $this->admin_url = "wppb-manage-$this->class_name";
       $this->set_routes();
@@ -37,11 +42,11 @@ class WordPress_Plugin_Model{
       $ids = $wpdb->get_results("SELECT id FROM $this->table_name");
       $all_objects = array();
       foreach($ids as $id){
-        #$obj = $wpdb->get_results("SELECT * FROM $this->table_name WHERE id=`$id`");
         $obj = new WordPress_Plugin_Model($this->name, $this->attr, 'show', $id);
         $all_objects[] = $obj;
       }
       $this->saved_objects = $all_objects;
+      $this->set_index_headers();
     }
     elseif($action == "show" || $action == "edit"){
       $obj = $wpdb->get_results("SELECT * FROM $this->table_name WHERE id=`$id`", A_ARRAY);
@@ -126,6 +131,20 @@ class WordPress_Plugin_Model{
     require_once($this->index_path);
   }
 
+
+ /**
+  *  From table structure create array of headers
+  *  to display on admin index table
+  */
+  private function set_index_headers(){
+    foreach($this->structure as $row){
+      echo $row->Field;
+      print "<br />";
+      echo $row->Type;
+      print "<br />";
+    }
+    
+  }
 
 
 

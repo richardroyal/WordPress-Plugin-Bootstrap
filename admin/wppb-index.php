@@ -3,7 +3,9 @@ defined('WP_PLUGIN_URL') or die('Restricted access');
 if (!current_user_can('publish_posts')) wp_die( __('You do not have sufficient permissions to access this page.') );
 
 $objects = new WordPress_Plugin_Model(null, null, 'index');
-var_dump($objects);
+
+
+//var_dump($objects->structure);
 
 ?>
 <div class="wrap wprmm">
