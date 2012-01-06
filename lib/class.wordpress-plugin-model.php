@@ -132,18 +132,20 @@ class WordPress_Plugin_Model{
   }
 
 
+
  /**
   *  From table structure create array of headers
-  *  to display on admin index table
+  *  to display on admin index table. Columns name
+  *  'name' and 'title' go first
   */
   private function set_index_headers(){
+    $headers = array();
     foreach($this->structure as $row){
-      echo $row->Field;
-      print "<br />";
-      echo $row->Type;
-      print "<br />";
+      if( strtolower($row->Field) == "name" || strtolower($row->Field) == "title"){
+        $headers[] = ucfirst($row->Field);
+      }
     }
-    
+    $this->headers = $headers; 
   }
 
 

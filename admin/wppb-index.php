@@ -3,9 +3,7 @@ defined('WP_PLUGIN_URL') or die('Restricted access');
 if (!current_user_can('publish_posts')) wp_die( __('You do not have sufficient permissions to access this page.') );
 
 $objects = new WordPress_Plugin_Model(null, null, 'index');
-
-
-//var_dump($objects->structure);
+var_dump($objects->headers);
 
 ?>
 <div class="wrap wprmm">
@@ -18,11 +16,10 @@ $objects = new WordPress_Plugin_Model(null, null, 'index');
   <table class="widefat">
   <thead>
     <tr>
+      <th></th>
       <th><?php echo $objects->name;?></th>
-      <th>Edit Menu</th>
-      <th>Edit Menu Category Set</th>
-      <th>Edit Menu Items</th>
-      <th>Print</th>
+      <th>Show</th>
+      <th>Edit</th>
       <th>Delete</th>
     </tr>
   </thead>
@@ -33,11 +30,16 @@ $objects = new WordPress_Plugin_Model(null, null, 'index');
       <th></th>
       <th></th>
       <th></th>
-      <th></th>
     </tr>
   </tfoot>
   <tbody>
-
+    <?php foreach($objects->saved_objects as $obj): ?>
+      <th><?php $obj->id?></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    <?php endforeach; ?>
   </tbody>
   </table>
 
