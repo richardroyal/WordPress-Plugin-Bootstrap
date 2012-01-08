@@ -24,7 +24,7 @@ $objects = new WordPress_Plugin_Model(null, null, 'index');
         <?php endif;?>
       <?php endforeach;?>
 
-      <th>Actions</th>
+      <th style="text-align:center;">Actions</th>
     </tr>
   </thead>
   <tfoot>
@@ -36,16 +36,22 @@ $objects = new WordPress_Plugin_Model(null, null, 'index');
   </tfoot>
   <tbody>
     <?php foreach($objects->saved_objects as $obj): ?>
-      <?php foreach( $objects->headers as $h ): ?>
-          <th><?php echo $obj->get_val( $h ); ?></th>
-      <?php endforeach;?>
+      <tr>
+        <?php foreach( $objects->headers as $h ): ?>
+          <td><?php echo $obj->get_val( $h ); ?></td>
+        <?php endforeach;?>
+        <td style="text-align:right;">
+          <a href="<?php echo $obj->edit_url;?>">Edit</a> | 
+          <a href="">Delete</a>
+        </td>
+      </tr>
     <?php endforeach; ?>
   </tbody>
   </table>
 
   <div class="wprmm-admin-nav">
     <p>
-      <a class="button-primary" href="<?php # echo wprmm_admin_url('menu','new-menu','new');?>">+ Create New Menu</a>&nbsp;
+      <a class="button-primary" href="<?php # echo wprmm_admin_url('menu','new-menu','new');?>">+ Create New <?php echo $objects->name?></a>&nbsp;
       <span><a class="button" href="<?php # echo wprmm_help_link(); ?>">help?</a></span>&nbsp;
     </p>
   </div>

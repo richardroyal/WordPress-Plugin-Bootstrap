@@ -27,7 +27,7 @@ class WordPress_Plugin_Model{
 
 
     if(is_admin()){
-      $this->admin_url = "wppb-manage-$this->class_name";
+      $this->admin_slug = "wppb-manage-$this->class_name";
       $this->set_routes();
     }
 
@@ -50,14 +50,8 @@ class WordPress_Plugin_Model{
     }
     elseif($action == "show" || $action == "edit"){
       $obj = $wpdb->get_results("SELECT * FROM `$this->table_name` WHERE id=$id");
-      /*
-      $attr = array();
-      foreach($obj as $field => $value){
-        $attr[$field] = $value;
-      }
-      $this->data = $attr;
-      */
       $this->data = $obj[0];
+      $this->edit_url .= $id;
     }
 
   }
@@ -104,11 +98,13 @@ class WordPress_Plugin_Model{
   *  Create class attributes related to routes
   */
   private function set_routes(){
+    $this->admin_url = admin_url()."admin.php?page=$this->admin_slug";
     // Index route: path and url
     $override = WPPB_PATH."/admin/$this->class_name/wppb-index.php";
     $this->index_path = file_exists($override) ? $override : WPPB_PATH.'admin/wppb-index.php';
-    $this->index_url = $this->admin_url.'&action=index';
+    $this->index_url = $this->admin_slug;
     
+    $this->edit_url = $this->admin_url.'&action=edit&id=';
   }
 
 
@@ -119,7 +115,7 @@ class WordPress_Plugin_Model{
   */
   public function create_menu(){
     // add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
-    add_menu_page("WP Model ".$this->name, "Manage ".$this->name, $this->capability, $this->admin_url, array(&$this, 'model_index'));
+    add_menu_page("WP Model ".$this->name, "Manage ".$this->name, $this->capability, $this->admin_slug, array(&$this, 'model_index'));
   }
 
 
@@ -158,6 +154,7 @@ class WordPress_Plugin_Model{
     }
     $this->headers = $headers; 
   }
+
 
 
  /**
