@@ -145,6 +145,13 @@ class WordPress_Plugin_Model{
         $headers[] = ucfirst($row->Field);
       }
     }
+    foreach($this->structure as $row){
+      if( strtolower($row->Field) != "name" && strtolower($row->Field) != "title"){
+        if( count( $headers < 5) ) {
+          $headers[] = ucfirst($row->Field);
+        }
+      }
+    }
     $this->headers = $headers; 
   }
 
