@@ -136,18 +136,19 @@ class WordPress_Plugin_Model{
  /**
   *  From table structure create array of headers
   *  to display on admin index table. Columns name
-  *  'name' and 'title' go first
+  *  'name' and 'title' and 'updated_at' are primary.
   */
   private function set_index_headers(){
     $headers = array();
+    $primary = array('id', 'name', 'title', 'updated_at');
     foreach($this->structure as $row){
-      if( strtolower($row->Field) == "name" || strtolower($row->Field) == "title"){
+      if( in_array($row->Field, $primary) ){
         $headers[] = ucfirst($row->Field);
       }
     }
     foreach($this->structure as $row){
-      if( strtolower($row->Field) != "name" && strtolower($row->Field) != "title"){
-        if( count( $headers < 5) ) {
+      if( !in_array($row->Field, $primary) ){
+        if( count( $headers ) < 3 ) {
           $headers[] = ucfirst($row->Field);
         }
       }
