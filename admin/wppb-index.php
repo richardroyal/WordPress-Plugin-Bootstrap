@@ -3,7 +3,7 @@ defined('WP_PLUGIN_URL') or die('Restricted access');
 if (!current_user_can('publish_posts')) wp_die( __('You do not have sufficient permissions to access this page.') );
 
 $objects = new WordPress_Plugin_Model(null, null, 'index');
-var_dump($objects->saved_objects);
+#var_dump($objects->saved_objects);
 
 ?>
 <div class="wrap wprmm">
@@ -19,7 +19,7 @@ var_dump($objects->saved_objects);
       <th><?php echo $objects->name;?></th>
 
       <?php foreach( $objects->headers as $h ): ?>
-        <?php if($h != "Id"): ?>
+        <?php if(strtolower($h) != "id"): ?>
           <th><?php echo $h;?></th>
         <?php endif;?>
       <?php endforeach;?>
@@ -36,10 +36,9 @@ var_dump($objects->saved_objects);
   </tfoot>
   <tbody>
     <?php foreach($objects->saved_objects as $obj): ?>
-      <th><?php $obj->id?></th>
-      <th></th>
-      <th></th>
-      <th></th>
+      <?php foreach( $objects->headers as $h ): ?>
+          <th><?php echo $obj->get_val( $h ); ?></th>
+      <?php endforeach;?>
     <?php endforeach; ?>
   </tbody>
   </table>

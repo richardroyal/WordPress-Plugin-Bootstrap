@@ -42,19 +42,22 @@ class WordPress_Plugin_Model{
       $ids = $wpdb->get_results("SELECT id FROM $this->table_name");
       $all_objects = array();
       foreach($ids as $id){
-        $obj = new WordPress_Plugin_Model($this->name, $this->attr, 'show', $id);
+        $obj = new WordPress_Plugin_Model($this->name, $this->attr, 'show', $id->id);
         $all_objects[] = $obj;
       }
       $this->saved_objects = $all_objects;
       $this->set_index_headers();
     }
     elseif($action == "show" || $action == "edit"){
-      $obj = $wpdb->get_results("SELECT * FROM $this->table_name WHERE id=`$id`", A_ARRAY);
+      $obj = $wpdb->get_results("SELECT * FROM `$this->table_name` WHERE id=$id");
+      /*
       $attr = array();
       foreach($obj as $field => $value){
         $attr[$field] = $value;
       }
       $this->data = $attr;
+      */
+      $this->data = $obj[0];
     }
 
   }
@@ -157,6 +160,14 @@ class WordPress_Plugin_Model{
   }
 
 
+ /**
+  *  Returns value for header in show
+  */
+  public function get_val($col){
+    if(empty($col) || empty($this->data)) return '';
+    $c = strtolower($col);
+    return $this->data->$c;
+  }
 
 }
 ?>
