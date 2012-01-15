@@ -15,30 +15,28 @@ class WordPress_Plugin_Model{
   public function __construct($name, $attr, $action = "setup", $id = NULL) {
     global $wpdb;
 
+    # Set class attributes and determine action and show template
     $this->set_name($name,$action);
-
+    $this->set_action($action);
     $this->class_name = strtolower(str_replace(array(" ","'"),array('_',''),$this->name));
     $this->table_name = $wpdb->prefix.'model_'.$this->class_name;
     $this->capability = "publish_posts";
-    $this->attr = $attr;
-
-    
+    $this->attr = $attr; 
     $this->structure = $wpdb->get_results("SHOW COLUMNS FROM $this->table_name");
-
 
     if(is_admin()){
       $this->admin_slug = "wppb-manage-$this->class_name";
       $this->set_routes();
     }
 
-    # Set attributes based on action
-    if($action == "setup"){
+    # Set action attributes based on action
+    if($this->action == "setup"){
       if(function_exists('is_admin') && is_admin()){
-        $this->verify_db();
         add_action('admin_menu', array(&$this, 'create_menu'));
+        $this->verify_db();
       }
     }
-    elseif($action == "index"){
+    elseif($this->action == "index"){
       $ids = $wpdb->get_results("SELECT id FROM $this->table_name");
       $all_objects = array();
       foreach($ids as $id){
@@ -48,7 +46,7 @@ class WordPress_Plugin_Model{
       $this->saved_objects = $all_objects;
       $this->set_index_headers();
     }
-    elseif($action == "show" || $action == "edit"){
+    elseif($this->action == "show" || $this->action == "edit"){
       $obj = $wpdb->get_results("SELECT * FROM `$this->table_name` WHERE id=$id");
       $this->data = $obj[0];
       $this->edit_url .= $id;
@@ -68,6 +66,20 @@ class WordPress_Plugin_Model{
         $this->name = ucfirst(str_replace('wppb-manage-', '', $_GET['page']));
       }
     } 
+  }
+
+
+
+ /**
+  *  Override $action from constructor params with GET array.
+  *  Use $control to limit actions to prevent URL hacking.
+  */
+  private function set_action($action){
+    $control = array('edit', 'show', 'index');
+    if($action != "setup" && !empty($_GET['action'])){
+      if(in_array($_GET['action'],$control)) $this->action = $_GET['action'];
+    }
+    else $this->action = $action;
   }
 
 
@@ -99,11 +111,15 @@ class WordPress_Plugin_Model{
   */
   private function set_routes(){
     $this->admin_url = admin_url()."admin.php?page=$this->admin_slug";
+
     // Index route: path and url
     $override = WPPB_PATH."/admin/$this->class_name/wppb-index.php";
     $this->index_path = file_exists($override) ? $override : WPPB_PATH.'admin/wppb-index.php';
     $this->index_url = $this->admin_slug;
     
+    // Edit routes
+    $override = WPPB_PATH."/admin/$this->class_name/wppb-edit.php";
+    $this->edit_path = file_exists($override) ? $override : WPPB_PATH.'admin/wppb-edit.php';
     $this->edit_url = $this->admin_url.'&action=edit&id=';
   }
 
@@ -115,19 +131,30 @@ class WordPress_Plugin_Model{
   */
   public function create_menu(){
     // add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
-    add_menu_page("WP Model ".$this->name, "Manage ".$this->name, $this->capability, $this->admin_slug, array(&$this, 'model_index'));
+    add_menu_page("WP Model ".$this->name, "Manage ".$this->name, $this->capability, $this->admin_slug, array(&$this, 'load_action'));
   }
 
 
 
 
  /**
-  *  Loads index file for object wppb_index.php
-  *  Override by adding a file {sanitized_class_name}/wppb_index.php
+  *  Loads index, edit, or show file for object based on $this->action
+  *  Override by adding a file {sanitized_class_name}/wppb_{action}.php
   *  in admin folder.
   */
-  public function model_index(){
-    require_once($this->index_path);
+  public function load_action(){
+    echo "<h2>$this->action</h2>";
+    switch($this->action){
+      case "edit":
+        require_once($this->edit_path);
+        break;
+      case "show":
+        require_once($this->show_path);
+        break;
+      case "index":
+        require_once($this->index_path);
+        break;
+    }
   }
 
 
