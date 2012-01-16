@@ -75,7 +75,7 @@ class WordPress_Plugin_Model{
   *  Use $control to limit actions to prevent URL hacking.
   */
   private function set_action($action){
-    $control = array('edit', 'show', 'index');
+    $control = array('dispatch', 'edit', 'show', 'index');
     if($action != "setup" && !empty($_GET['action'])){
       if(in_array($_GET['action'],$control)) $this->action = $_GET['action'];
     }
@@ -112,6 +112,11 @@ class WordPress_Plugin_Model{
   private function set_routes(){
     $this->admin_url = admin_url()."admin.php?page=$this->admin_slug";
 
+    // Dispatcher route: path and url
+    $override = WPPB_PATH."/admin/$this->class_name/wppb-dispatcher.php";
+    $this->dispatcher_path = file_exists($override) ? $override : WPPB_PATH.'admin/wppb-dispatcher.php';
+    $this->dispatcher_url = $this->admin_slug;
+    
     // Index route: path and url
     $override = WPPB_PATH."/admin/$this->class_name/wppb-index.php";
     $this->index_path = file_exists($override) ? $override : WPPB_PATH.'admin/wppb-index.php';
@@ -131,7 +136,7 @@ class WordPress_Plugin_Model{
   */
   public function create_menu(){
     // add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
-    add_menu_page("WP Model ".$this->name, "Manage ".$this->name, $this->capability, $this->admin_slug, array(&$this, 'load_action'));
+    add_menu_page("WP Model ".$this->name, "Manage ".$this->name, $this->capability, $this->admin_slug, array(&$this, 'load_dispatcher'));
   }
 
 
@@ -143,7 +148,6 @@ class WordPress_Plugin_Model{
   *  in admin folder.
   */
   public function load_action(){
-    echo "<h2>$this->action</h2>";
     switch($this->action){
       case "edit":
         require_once($this->edit_path);
@@ -152,11 +156,14 @@ class WordPress_Plugin_Model{
         require_once($this->show_path);
         break;
       case "index":
+      case "dispatch":
         require_once($this->index_path);
         break;
     }
   }
-
+  public function load_dispatcher(){
+    require_once($this->dispatcher_path);
+  }
 
 
  /**
