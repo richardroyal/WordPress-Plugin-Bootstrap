@@ -2,6 +2,8 @@
 
 Simple WordPress Plugin Bootstrap that allows for easy creation of Admin CRUD actions for widgets and objects so that you can stay DRY.
 
+UNDER CONSTRUCTION
+
 # Features
 * Easily generate object models with one function call that will automatically:
   * Create admin administration areas for Index, Edit, View.
