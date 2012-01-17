@@ -24,6 +24,7 @@ class WordPress_Plugin_Model{
     $this->attr = $attr; 
     $this->structure = $wpdb->get_results("SHOW COLUMNS FROM $this->table_name");
 
+
     if(is_admin()){
       $this->admin_slug = "wppb-manage-$this->class_name";
       $this->set_routes();
@@ -52,6 +53,8 @@ class WordPress_Plugin_Model{
       $this->edit_url .= $id;
     }
 
+    # Register JavaScripts and CSS
+    add_action('init',$this->load_assets());
   }
 
 
@@ -126,6 +129,12 @@ class WordPress_Plugin_Model{
     $override = WPPB_PATH."/admin/$this->class_name/wppb-edit.php";
     $this->edit_path = file_exists($override) ? $override : WPPB_PATH.'admin/wppb-edit.php';
     $this->edit_url = $this->admin_url.'&action=edit&id=';
+    
+    # Aux routes and URLs
+    $this->path = plugin_dir_path(__FILE__);
+    $this->url = plugins_url('', __FILE__);
+    $this->assets_url = $this->url.'/../assets/';
+
   }
 
 
@@ -199,6 +208,18 @@ class WordPress_Plugin_Model{
     $c = strtolower($col);
     return $this->data->$c;
   }
+
+
+ /**
+  *  Registers and loads assets CSS and JavaScript
+  */
+  private function load_assets(){
+    if(is_admin()){
+      wp_enqueue_style("wppb-admin-css", $this->assets_url.'/css/admin/bootstrap.css');
+    }
+      
+  }
+
 
 }
 ?>

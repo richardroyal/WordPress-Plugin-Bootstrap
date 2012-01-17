@@ -20,11 +20,11 @@ $objects = new WordPress_Plugin_Model(null, null, 'index');
 
       <?php foreach( $objects->headers as $h ): ?>
         <?php if(strtolower($h) != "id"): ?>
-          <th><?php echo $h;?></th>
+          <th><?php echo str_replace(array('_'),array(' '),$h); ?></th>
         <?php endif;?>
       <?php endforeach;?>
 
-      <th style="text-align:center;">Actions</th>
+      <th class="actions">Actions</th>
     </tr>
   </thead>
   <tfoot>
@@ -40,7 +40,7 @@ $objects = new WordPress_Plugin_Model(null, null, 'index');
         <?php foreach( $objects->headers as $h ): ?>
           <td><?php echo $obj->get_val( $h ); ?></td>
         <?php endforeach;?>
-        <td style="text-align:right;">
+        <td class="actions">
           <a href="<?php echo $obj->edit_url;?>">Edit</a> | 
           <a href="">Delete</a>
         </td>
