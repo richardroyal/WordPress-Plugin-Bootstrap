@@ -4,8 +4,6 @@ if (!current_user_can('publish_posts')) wp_die( __('You do not have sufficient p
 
 $object = new WordPress_Plugin_Model(null, null, 'edit', $_GET['id']);
 
-var_dump($object);
-
 ?>
 <div class="wrap wprmm">
   <div id="icon-tools" class="icon32"></div><h2 class="left">Edit <?php echo $object->name;?></h2>
@@ -13,11 +11,59 @@ var_dump($object);
   <hr />
 
   <?php #wprmm_get_help(array('main'=>true));?>
-  <?php
-    global $menu, $admin_page_hooks, $_registered_pages, $_parent_pages;
-    var_dump($_registered_pages);
-  
-  ?>
+
+  <form method="post" action="<?php $_SERVER['REQUEST_URI'];?>">
+    <table class="form-table">    
+      <tbody>
+
+        <?php foreach($object->structure as $field): ?>
+          <?php $label = ucwords(str_replace(array('_'), array(' '), $field->Field));?>
+          <?php $class = strtolower($field->Field);?>
+          <tr valign="top">
+             
+            <!-- Label -->
+            <th scope="row">
+              <label for="<?php echo $class;?>"><?php echo $label;?></label>
+            </th>
+
+
+            <!-- Field Edit with dynamic type -->
+            <td>
+              <!-- Not Editable -->
+              <?php if(in_array($field->Field, array('id', 'updated_at'))):?>
+                <input name="<?php echo $class;?>" type="text" id="<?php echo $class;?>" value="<?php echo $object->get_val($field->Field);?>" class="regular-text" readonly="readonly" />
+
+
+              <!-- Rich Text -->
+              <?php elseif($field->Type == "text"): ?>
+
+                  <?php if(function_exists('wp_editor')): ?>
+                    <?php wp_editor($object->get_val($field->Field), $class, array('textarea_rows'=>5)); ?>
+                  <?php else: ?>
+                    <textarea name="<?php echo $class;?>" id="<?php echo $class;?>"><?php echo $class;?></textarea>
+                 <?php endif;?>
+
+
+              <!-- Boolean -->
+              <?php elseif($field->Type == "tinyint(1)"): ?>
+                <input type="checkbox" name="<?php echo $class;?>" value="1" <?php echo ($object->get_val($field->Field) == 1)? "checked" : ""; ?> />
+
+
+
+              <!-- String and default -->
+              <?php else: ?>
+                <input name="<?php echo $class;?>" type="text" id="<?php echo $class;?>" value="<?php echo $object->get_val($field->Field);?>" class="regular-text">
+              <?php endif; ?>
+            </td>
+          </tr>
+        <?php endforeach;?>
+      </tbody>
+    </table>
+
+    <p class="submit"><input type="submit" name="submit" id="submit" class="button-primary" value="Save Changes"></p>
+
+  </form>
+
 
 
 </div>      

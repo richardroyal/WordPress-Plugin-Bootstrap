@@ -64,7 +64,7 @@ class WordPress_Plugin_Model{
   */
   private function set_name($name, $action){
     if(!empty($name)) $this->name = ucfirst($name);
-    elseif($action == "index"){
+    else{
       if(is_admin()){
         $this->name = ucfirst(str_replace('wppb-manage-', '', $_GET['page']));
       }
@@ -185,13 +185,13 @@ class WordPress_Plugin_Model{
     $primary = array('id', 'name', 'title', 'updated_at');
     foreach($this->structure as $row){
       if( in_array($row->Field, $primary) ){
-        $headers[] = ucfirst($row->Field);
+        $headers[] = ucwords($row->Field);
       }
     }
     foreach($this->structure as $row){
       if( !in_array($row->Field, $primary) ){
         if( count( $headers ) < 3 ) {
-          $headers[] = ucfirst($row->Field);
+          $headers[] = ucwords($row->Field);
         }
       }
     }

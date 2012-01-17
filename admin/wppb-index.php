@@ -20,7 +20,7 @@ $objects = new WordPress_Plugin_Model(null, null, 'index');
 
       <?php foreach( $objects->headers as $h ): ?>
         <?php if(strtolower($h) != "id"): ?>
-          <th><?php echo str_replace(array('_'),array(' '),$h); ?></th>
+          <th><?php echo ucwords(str_replace(array('_'),array(' '),$h)); ?></th>
         <?php endif;?>
       <?php endforeach;?>
 
