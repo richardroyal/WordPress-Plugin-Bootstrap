@@ -1,0 +1,5 @@
+/* Admin Actions */
+table td.actions{
+  text-align:right;  
+}
+table th.actions, table td.actions{width:150px;}
