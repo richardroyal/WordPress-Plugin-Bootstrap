@@ -60,7 +60,11 @@ $object = new WordPress_Plugin_Model(null, null, 'edit', $_GET['id']);
       </tbody>
     </table>
 
-    <p class="submit"><input type="submit" name="submit" id="submit" class="button-primary" value="Save Changes"></p>
+
+    <p class="submit">
+      <a href="<?php echo $object->admin_url;?>" class="button-secondary">&laquo; Back</a>
+      <input type="submit" name="submit" id="submit" class="button-primary" value="Save Changes" />
+    </p>
 
   </form>
 
