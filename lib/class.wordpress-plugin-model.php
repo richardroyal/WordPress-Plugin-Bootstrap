@@ -57,6 +57,51 @@ class WordPress_Plugin_Model{
   }
 
 
+  /* ---------- Controller Actions ------------- */
+
+
+ /**
+  *  Setup Admin menu and DB - Run only once
+  */
+  private function setup(){
+    if(function_exists('is_admin') && is_admin()){
+      add_action('admin_menu', array(&$this, 'create_menu'));
+      $this->verify_db();
+    }
+  }
+
+
+ /**
+  *  Create object with array of model objects
+  */
+  public function index(){
+    global $wpdb;
+    $ids = $wpdb->get_results("SELECT id FROM $this->table_name");
+    $all_objects = array();
+    foreach($ids as $id){
+      $obj = new WordPress_Plugin_Model($this->name, $this->attr, 'show', $id->id);
+      $all_objects[] = $obj;
+    }
+    $this->saved_objects = $all_objects;
+    $this->set_index_headers();
+    
+  }
+
+ /**
+  *  Call save and then load object along with full DB structure
+  */
+  public function edit(){
+    global $wpdb;
+    $this->update();
+    if($this->action == "edit"){
+      $this->update();
+      $obj = $wpdb->get_results("SELECT * FROM `$this->table_name` WHERE id=$this->id");
+      $this->data = $obj[0];
+      $this->edit_url .= $this->id;
+    }
+  }
+
+
 
  /**
   *  Determine name from action or constructor
@@ -106,50 +151,6 @@ class WordPress_Plugin_Model{
     dbDelta($sql);
   }
 
-
-  /* ---------- Controller Actions ------------- */
-
-
- /**
-  *  Setup Admin menu and DB - Run only once
-  */
-  private function setup(){
-    if(function_exists('is_admin') && is_admin()){
-      add_action('admin_menu', array(&$this, 'create_menu'));
-      $this->verify_db();
-    }
-  }
-
-
- /**
-  *  Create object with array of model objects
-  */
-  public function index(){
-    global $wpdb;
-    $ids = $wpdb->get_results("SELECT id FROM $this->table_name");
-    $all_objects = array();
-    foreach($ids as $id){
-      $obj = new WordPress_Plugin_Model($this->name, $this->attr, 'show', $id->id);
-      $all_objects[] = $obj;
-    }
-    $this->saved_objects = $all_objects;
-    $this->set_index_headers();
-    
-  }
-
- /**
-  *  Call save and then load object along with full DB structure
-  */
-  public function edit(){
-    global $wpdb;
-    $this->update();
-    if($this->action == "edit"){
-      $this->update();
-      $obj = $wpdb->get_results("SELECT * FROM `$this->table_name` WHERE id=$this->id");
-      $this->data = $obj[0];
-      $this->edit_url .= $this->id;
-    }
-  }
 
 
 
@@ -275,10 +276,11 @@ class WordPress_Plugin_Model{
   private function update(){
     if(is_admin() && !empty($_POST[$this->class_name]) ){
       global $wpdb;
+
       $object = $_POST[$this->class_name];
       if(empty($object) || empty($object['id']) || empty($this->id) || $this->called_action == "dispatch") return "";
       if($object['submit'] == "Save"){
-        echo "<br />UPDATING ACTION: $this->action , TABLE: $this->table_name ,  $this->id ";
+        echo "<br />UPDATING ACTION: $this->called_action - $this->action, TABLE: $this->table_name ,  $this->id ";
 
         $wpdb->update($this->table_name, $object, array('id' => "$this->id"));
         
