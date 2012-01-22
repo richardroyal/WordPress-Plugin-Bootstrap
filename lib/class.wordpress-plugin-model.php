@@ -14,7 +14,7 @@ class WordPress_Plugin_Model{
   */
   public function __construct($name, $attr, $action = "setup", $id = NULL) {
     global $wpdb;
-
+    
     # Set class attributes and determine action and show template
     $this->set_name($name,$action);
     $this->set_action($action);
@@ -23,6 +23,7 @@ class WordPress_Plugin_Model{
     $this->capability = "publish_posts";
     $this->attr = $attr; 
     $this->structure = $wpdb->get_results("SHOW COLUMNS FROM $this->table_name");
+    $this->id = $id;
 
 
     if(is_admin()){
@@ -30,27 +31,25 @@ class WordPress_Plugin_Model{
       $this->set_routes();
     }
 
+
+
+    /* Call controller actions based on $this->action  */
+    if( method_exists($this, $this->action) ){
+      call_user_func(array($this, $this->action));
+    }
+
     # Set action attributes based on action
-    if($this->action == "setup"){
-      if(function_exists('is_admin') && is_admin()){
-        add_action('admin_menu', array(&$this, 'create_menu'));
-        $this->verify_db();
-      }
-    }
-    elseif($this->action == "index"){
-      $ids = $wpdb->get_results("SELECT id FROM $this->table_name");
-      $all_objects = array();
-      foreach($ids as $id){
-        $obj = new WordPress_Plugin_Model($this->name, $this->attr, 'show', $id->id);
-        $all_objects[] = $obj;
-      }
-      $this->saved_objects = $all_objects;
-      $this->set_index_headers();
-    }
-    elseif($this->action == "show" || $this->action == "edit"){
+    elseif($this->action == "show"){
       $obj = $wpdb->get_results("SELECT * FROM `$this->table_name` WHERE id=$id");
       $this->data = $obj[0];
       $this->edit_url .= $id;
+        
+    }
+    elseif($this->action == "new"){
+      $obj = $wpdb->get_results("SELECT * FROM `$this->table_name` WHERE id=$id");
+      $this->data = $obj[0];
+      $this->edit_url .= $id;
+        
     }
 
     # Register JavaScripts and CSS
@@ -78,6 +77,7 @@ class WordPress_Plugin_Model{
   *  Use $control to limit actions to prevent URL hacking.
   */
   private function set_action($action){
+    $this->called_action = $action;
     $control = array('dispatch', 'edit', 'show', 'index');
     if($action != "setup" && !empty($_GET['action'])){
       if(in_array($_GET['action'],$control)) $this->action = $_GET['action'];
@@ -105,6 +105,53 @@ class WordPress_Plugin_Model{
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
   }
+
+
+  /* ---------- Controller Actions ------------- */
+
+
+ /**
+  *  Setup Admin menu and DB - Run only once
+  */
+  private function setup(){
+    if(function_exists('is_admin') && is_admin()){
+      add_action('admin_menu', array(&$this, 'create_menu'));
+      $this->verify_db();
+    }
+  }
+
+
+ /**
+  *  Create object with array of model objects
+  */
+  public function index(){
+    global $wpdb;
+    $ids = $wpdb->get_results("SELECT id FROM $this->table_name");
+    $all_objects = array();
+    foreach($ids as $id){
+      $obj = new WordPress_Plugin_Model($this->name, $this->attr, 'show', $id->id);
+      $all_objects[] = $obj;
+    }
+    $this->saved_objects = $all_objects;
+    $this->set_index_headers();
+    
+  }
+
+ /**
+  *  Call save and then load object along with full DB structure
+  */
+  public function edit(){
+    global $wpdb;
+    $this->update();
+    if($this->action == "edit"){
+      $this->update();
+      $obj = $wpdb->get_results("SELECT * FROM `$this->table_name` WHERE id=$this->id");
+      $this->data = $obj[0];
+      $this->edit_url .= $this->id;
+    }
+  }
+
+
 
 
 
@@ -218,6 +265,25 @@ class WordPress_Plugin_Model{
       wp_enqueue_style("wppb-admin-css", $this->assets_url.'/css/admin/bootstrap.css');
     }
       
+  }
+
+
+
+ /**
+  *  Call Validations and then update DB
+  */
+  private function update(){
+    if(is_admin() && !empty($_POST[$this->class_name]) ){
+      global $wpdb;
+      $object = $_POST[$this->class_name];
+      if(empty($object) || empty($object['id']) || empty($this->id) || $this->called_action == "dispatch") return "";
+      if($object['submit'] == "Save"){
+        echo "<br />UPDATING ACTION: $this->action , TABLE: $this->table_name ,  $this->id ";
+
+        $wpdb->update($this->table_name, $object, array('id' => "$this->id"));
+        
+      }
+    }
   }
 
 
