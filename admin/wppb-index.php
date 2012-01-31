@@ -51,7 +51,7 @@ $objects = new WordPress_Plugin_Model(null, null, 'index');
 
   <div class="wprmm-admin-nav">
     <p>
-      <a class="button-primary" href="<?php # echo wprmm_admin_url('menu','new-menu','new');?>">+ Create New <?php echo $objects->name?></a>&nbsp;
+      <a class="button-primary" href="<?php echo $objects->new_url;?>">+ Create New <?php echo $objects->name?></a>&nbsp;
       <span><a class="button" href="<?php # echo wprmm_help_link(); ?>">help?</a></span>&nbsp;
     </p>
   </div>

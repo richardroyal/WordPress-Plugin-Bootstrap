@@ -93,7 +93,6 @@ class WordPress_Plugin_Model{
   */
   public function edit(){
     global $wpdb;
-    $this->update();
     if($this->action == "edit"){
       $this->update();
       $obj = $wpdb->get_results("SELECT * FROM `$this->table_name` WHERE id=$this->id");
@@ -179,6 +178,10 @@ class WordPress_Plugin_Model{
     $this->edit_path = file_exists($override) ? $override : WPPB_PATH.'admin/wppb-edit.php';
     $this->edit_url = $this->admin_url.'&action=edit&id=';
     
+    $override = WPPB_PATH."/admin/$this->class_name/wppb-edit.php";
+    $this->new_path = file_exists($override) ? $override : WPPB_PATH.'admin/wppb-edit.php';
+    $this->new_url = $this->admin_url.'&action=new';
+    
     # Aux routes and URLs
     $this->path = plugin_dir_path(__FILE__);
     $this->url = plugins_url('', __FILE__);
@@ -208,6 +211,7 @@ class WordPress_Plugin_Model{
   public function load_action(){
     switch($this->action){
       case "edit":
+      case "new":
         require_once($this->edit_path);
         break;
       case "show":
