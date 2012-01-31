@@ -281,10 +281,14 @@ class WordPress_Plugin_Model{
       $object = $_POST[$this->class_name];
       if(empty($object) || empty($object['id']) || empty($this->id) || $this->called_action == "dispatch") return "";
       if($object['submit'] == "Save" && $object[id] == $this->id){
-        unset($object['submit']);
-        unset($object['updated_at']);
+        $data = array();
+        foreach($this->structure as $field){
+          $data[$field->Field] = $object[$field->Field];  
+        }
+        unset($data['submit']);
+        unset($data['updated_at']);
 
-        $wpdb->update($this->table_name, $object, array('id' => "$this->id"));
+        $wpdb->update($this->table_name, $data, array('id' => "$this->id"));
         
       }
     }
