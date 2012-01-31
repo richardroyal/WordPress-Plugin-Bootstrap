@@ -54,6 +54,7 @@ class WordPress_Plugin_Model{
 
     # Register JavaScripts and CSS
     add_action('init',$this->load_assets());
+
   }
 
 
@@ -279,8 +280,9 @@ class WordPress_Plugin_Model{
 
       $object = $_POST[$this->class_name];
       if(empty($object) || empty($object['id']) || empty($this->id) || $this->called_action == "dispatch") return "";
-      if($object['submit'] == "Save"){
-        echo "<br />UPDATING ACTION: $this->called_action - $this->action, TABLE: $this->table_name ,  $this->id ";
+      if($object['submit'] == "Save" && $object[id] == $this->id){
+        unset($object['submit']);
+        unset($object['updated_at']);
 
         $wpdb->update($this->table_name, $object, array('id' => "$this->id"));
         
