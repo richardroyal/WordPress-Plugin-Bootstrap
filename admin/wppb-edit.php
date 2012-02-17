@@ -13,7 +13,7 @@ $object = new WordPress_Plugin_Model(null, null, $_GET['action'], $_GET['id']);
 
   <?php #wprmm_get_help(array('main'=>true));?>
 
-  <form method="post" action="<?php $_SERVER['REQUEST_URI'];?>">
+  <form method="post" action="<?php echo $object->form_post_url;?>">
     <table class="form-table">    
       <tbody>
 

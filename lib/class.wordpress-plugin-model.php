@@ -26,10 +26,8 @@ class WordPress_Plugin_Model{
     $this->id = $id;
 
 
-    if(is_admin()){
-      $this->admin_slug = "wppb-manage-$this->class_name";
-      $this->set_routes();
-    }
+    $this->admin_slug = "wppb-manage-$this->class_name";
+    $this->set_routes();
 
 
 
@@ -46,10 +44,7 @@ class WordPress_Plugin_Model{
         
     }
     elseif($this->action == "new"){
-      $obj = $wpdb->get_results("SELECT * FROM `$this->table_name` WHERE id=$id");
-      $this->data = $obj[0];
-      $this->edit_url .= $id;
-        
+      $this->form_post_url = $this->crud_url;
     }
 
     # Register JavaScripts and CSS
@@ -65,6 +60,10 @@ class WordPress_Plugin_Model{
   *  Setup Admin menu and DB - Run only once
   */
   private function setup(){
+    # Register CRUD routing
+    add_filter('query_vars', array(&$this, 'wppb_parse_query_vars'));
+    add_action('parse_request', array(&$this,'wppb_parse_crud'));
+
     if(function_exists('is_admin') && is_admin()){
       add_action('admin_menu', array(&$this, 'create_menu'));
       $this->verify_db();
@@ -98,6 +97,7 @@ class WordPress_Plugin_Model{
       $obj = $wpdb->get_results("SELECT * FROM `$this->table_name` WHERE id=$this->id");
       $this->data = $obj[0];
       $this->edit_url .= $this->id;
+      $this->form_post_url = $_SERVER['REQUEST_URI'];
     }
   }
 
@@ -123,7 +123,7 @@ class WordPress_Plugin_Model{
   */
   private function set_action($action){
     $this->called_action = $action;
-    $control = array('dispatch', 'edit', 'show', 'index');
+    $control = array('dispatch', 'edit', 'show', 'index', 'new');
     if($action != "setup" && !empty($_GET['action'])){
       if(in_array($_GET['action'],$control)) $this->action = $_GET['action'];
     }
@@ -182,11 +182,13 @@ class WordPress_Plugin_Model{
     $this->new_path = file_exists($override) ? $override : WPPB_PATH.'admin/wppb-edit.php';
     $this->new_url = $this->admin_url.'&action=new';
     
-    # Aux routes and URLs
+    # Aux routes and URLs, Extend CRUD URLs
     $this->path = plugin_dir_path(__FILE__);
     $this->url = plugins_url('', __FILE__);
     $this->assets_url = $this->url.'/../assets/';
 
+    $this->crud_key = "wppb-$this->class_name-routing";
+    $this->crud_url = site_url()."/?$this->crud_key=crud";
   }
 
 
@@ -296,6 +298,34 @@ class WordPress_Plugin_Model{
         
       }
     }
+  }
+
+
+
+
+
+
+ /** 
+  *  Create CRUD routing for create and delete upon setup.
+  *  Process requests POST'ed to "/?wppb-{class_name}-routing=crud" by admin user.
+  */
+  public function wppb_parse_crud($wp) {
+    echo("IN CRUD<br />");
+    var_dump($wp->query_vars);
+    echo("IN CRUD");
+    var_dump($this);
+    if (array_key_exists($this->crud_key, $wp->query_vars) && $wp->query_vars[$this->crud_key] == 'crud') {
+      die("balls");
+#      die($this->dispatcher_path);
+       #require_once($this->dispatcher_path);
+#      include('admin/crud-routing.php');
+      die();exit();
+    }
+  }
+
+  public function wppb_parse_query_vars($vars) {
+    $vars[] = "wppb-$this->class_name-routing";
+    return $vars;
   }
 
 
