@@ -310,15 +310,8 @@ class WordPress_Plugin_Model{
   *  Process requests POST'ed to "/?wppb-{class_name}-routing=crud" by admin user.
   */
   public function wppb_parse_crud($wp) {
-    echo("IN CRUD<br />");
-    var_dump($wp->query_vars);
-    echo("IN CRUD");
-    var_dump($this);
     if (array_key_exists($this->crud_key, $wp->query_vars) && $wp->query_vars[$this->crud_key] == 'crud') {
-      die("balls");
-#      die($this->dispatcher_path);
-       #require_once($this->dispatcher_path);
-#      include('admin/crud-routing.php');
+       require_once($this->dispatcher_path);
       die();exit();
     }
   }

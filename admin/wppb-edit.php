@@ -64,6 +64,7 @@ $object = new WordPress_Plugin_Model(null, null, $_GET['action'], $_GET['id']);
 
     <p class="submit">
       <a href="<?php echo $object->admin_url;?>" class="button-secondary">&laquo; Back</a>
+      <input type="hidden" name="<?php echo "$object->class_name[action]";?>" value="<?php echo "$this->action"; ?>" />
       <input type="submit" name="<?php echo "$object->class_name[submit]"; ?>" id="submit" class="button-primary" value="Save" />
       
     </p>
