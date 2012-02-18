@@ -12,7 +12,7 @@ class WordPress_Plugin_Model{
   *          int    : database id
   *                      
   */
-  public function __construct($name, $attr, $action = "setup", $id = NULL) {
+  public function __construct($name, $attr, $action = "setup", $id = NULL, $values = NULL){
     global $wpdb;
     
     # Set class attributes and determine action and show template
@@ -24,6 +24,7 @@ class WordPress_Plugin_Model{
     $this->attr = $attr; 
     $this->structure = $wpdb->get_results("SHOW COLUMNS FROM $this->table_name");
     $this->id = $id;
+    $this->values = $values;
 
 
     $this->admin_slug = "wppb-manage-$this->class_name";
@@ -49,7 +50,6 @@ class WordPress_Plugin_Model{
 
     # Register JavaScripts and CSS
     add_action('init',$this->load_assets());
-
   }
 
 
@@ -103,16 +103,39 @@ class WordPress_Plugin_Model{
 
 
 
+
+ /**
+  *  Call save and then load object along with full DB structure
+  */
+  public function create(){
+    global $wpdb;
+    $data = $this->values;
+    unset($data['id']);
+    unset($data['action']);
+    unset($data['updated_at']);
+    unset($data['submit']);
+    $saved = $wpdb->insert($this->table_name, $data);
+    $id = $wpdb->insert_id;
+    if(!empty($id)){ 
+      wp_redirect($this->edit_url . $id);
+      die();exit;
+    }
+    else(wp_die("You do not have permission to modify this object"));
+  }
+
+
+
  /**
   *  Determine name from action or constructor
   */
   private function set_name($name, $action){
     if(!empty($name)) $this->name = ucfirst($name);
-    else{
-      if(is_admin()){
+    elseif( function_exists('is_admin') &&  is_admin()){
         $this->name = ucfirst(str_replace('wppb-manage-', '', $_GET['page']));
-      }
     } 
+    elseif(current_user_can('manage_options') && !empty($_POST)){
+      $this->name = ucfirst( $_POST['wppb_model_name']); 
+    }
   }
 
 
@@ -123,8 +146,8 @@ class WordPress_Plugin_Model{
   */
   private function set_action($action){
     $this->called_action = $action;
-    $control = array('dispatch', 'edit', 'show', 'index', 'new');
-    if($action != "setup" && !empty($_GET['action'])){
+    $control = array('dispatch', 'edit', 'show', 'index', 'new', 'create');
+    if($action != "setup" && $action != "create" && !empty($_GET['action'])){
       if(in_array($_GET['action'],$control)) $this->action = $_GET['action'];
     }
     else $this->action = $action;
@@ -281,7 +304,7 @@ class WordPress_Plugin_Model{
   *  Call Validations and then update DB
   */
   private function update(){
-    if(is_admin() && !empty($_POST[$this->class_name]) ){
+    if(is_admin() && !empty($_POST[$this->class_name])){
       global $wpdb;
 
       $object = $_POST[$this->class_name];
@@ -299,7 +322,6 @@ class WordPress_Plugin_Model{
       }
     }
   }
-
 
 
 
