@@ -41,8 +41,11 @@ $objects = new WordPress_Plugin_Model(null, null, 'index');
           <td><?php echo $obj->get_val( $h ); ?></td>
         <?php endforeach;?>
         <td class="actions">
-          <a href="<?php echo $obj->edit_url;?>">Edit</a> | 
-          <a href="">Delete</a>
+          <a class="button right" href="<?php echo $obj->edit_url;?>">Edit</a>
+          <form class="delete" action="<?php $obj->crud_url?>" method="post">
+            <input type="hidden" name="<?php "$this->class_name[id]";?>" value="<?php echo $obj->id;?>" />
+            <input type="submit" class="button left" name="<?php echo $this->class_name;?>" value="Delete" />
+          </form>
         </td>
       </tr>
     <?php endforeach; ?>

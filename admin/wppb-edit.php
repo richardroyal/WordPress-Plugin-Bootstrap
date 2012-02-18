@@ -2,7 +2,6 @@
 defined('WP_PLUGIN_URL') or die('Restricted access');
 if (!current_user_can('publish_posts')) wp_die( __('You do not have sufficient permissions to access this page.') );
 
-#$object = new WordPress_Plugin_Model(null, null, 'edit', $_GET['id']);
 $object = new WordPress_Plugin_Model(null, null, $_GET['action'], $_GET['id']);
 
 ?>

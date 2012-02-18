@@ -124,6 +124,22 @@ class WordPress_Plugin_Model{
   }
 
 
+ /**
+  *  Delete record and redirect to index
+  */
+  public function delete(){
+    global $wpdb;
+    if(current_user_can('manage_options')){
+
+      if(!empty($this->table_name)){ 
+        echo "$this->action $this->table_name<br />";
+        $wpdb->query("DELETE FROM $this->table_name WHERE id='$this->id'");
+      }
+    }
+
+    #wp_die("You do not have permission to modify this object.");
+  }
+
 
  /**
   *  Determine name from action or constructor
@@ -146,8 +162,8 @@ class WordPress_Plugin_Model{
   */
   private function set_action($action){
     $this->called_action = $action;
-    $control = array('dispatch', 'edit', 'show', 'index', 'new', 'create');
-    if($action != "setup" && $action != "create" && !empty($_GET['action'])){
+    $control = array('dispatch', 'edit', 'show', 'index', 'new', 'create', 'delete');
+    if($action != "setup" && $action != "create" && $action != "delete" && !empty($_GET['action'])){
       if(in_array($_GET['action'],$control)) $this->action = $_GET['action'];
     }
     else $this->action = $action;
